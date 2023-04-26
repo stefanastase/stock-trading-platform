@@ -13,6 +13,12 @@ services:
       AUTH_SECRET: secret
       EXPIRE_TIME_SEC: 3000
 
+  trading-platform:
+    hostname: trading-platform
+    build: ./platform
+    ports:
+      - 8082:5000
+  
   postgres:
     image: postgres
     restart: always
