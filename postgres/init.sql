@@ -6,3 +6,8 @@ CREATE TABLE IF NOT EXISTS clients (
     CONSTRAINT clients_pkey PRIMARY KEY ("ID"),
     CONSTRAINT "ClientID" UNIQUE ("ClientID")
 );
+
+CREATE TABLE IF NOT EXISTS blacklist (
+    "token" character varying(256) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT "token" UNIQUE ("token") 
+)
