@@ -10,4 +10,6 @@ CREATE TABLE IF NOT EXISTS clients (
 CREATE TABLE IF NOT EXISTS blacklist (
     "token" character varying(256) COLLATE pg_catalog."default" NOT NULL,
     CONSTRAINT "token" UNIQUE ("token") 
-)
+);
+
+CREATE DATABASE portfolios;

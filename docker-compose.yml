@@ -18,7 +18,17 @@ services:
     build: ./platform
     ports:
       - 8082:5000
-  
+
+# TODO different credentials
+  portfolio-mgmt:
+    hostname: portfolio-mgmt
+    build: ./portfolio-mgmt
+    environment:
+      HOST_NAME: postgres
+      DB_NAME: portfolios 
+      DB_USER: user
+      DB_PASSWORD: password
+
   postgres:
     image: postgres
     restart: always
