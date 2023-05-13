@@ -30,6 +30,15 @@ services:
       DB_USER: user
       DB_PASSWORD: password
 
+  order-mgmt:
+    hostname: order-mgmt
+    build: ./order-mgmt
+    environment:
+      HOST_NAME: postgres
+      DB_NAME: orders
+      DB_USER: user
+      DB_PASSWORD: password
+
   postgres:
     image: postgres
     restart: always
