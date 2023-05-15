@@ -19,6 +19,8 @@ services:
     build: ./platform
     ports:
       - 8082:5000
+    environment:
+      ORDER_SECRET: orderSecret
 
 # TODO different credentials
   portfolio-mgmt:
@@ -38,6 +40,7 @@ services:
       DB_NAME: orders
       DB_USER: user
       DB_PASSWORD: password
+      ORDER_SECRET: orderSecret
 
   postgres:
     image: postgres
