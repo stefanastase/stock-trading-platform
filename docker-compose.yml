@@ -12,7 +12,7 @@ services:
       DB_USER: user
       DB_PASSWORD: password
       AUTH_SECRET: secret
-      EXPIRE_TIME_SEC: 3000
+      EXPIRE_TIME_SEC: 1800 # 30 min
 
   trading-platform:
     hostname: trading-platform
