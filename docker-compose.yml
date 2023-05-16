@@ -13,6 +13,9 @@ services:
       DB_PASSWORD: password
       AUTH_SECRET: secret
       EXPIRE_TIME_SEC: 1800 # 30 min
+    networks:
+      - db_auth
+      - internal
 
   trading-platform:
     hostname: trading-platform
@@ -21,6 +24,9 @@ services:
       - 8082:5000
     environment:
       ORDER_SECRET: orderSecret
+    networks:
+      - platform
+      - internal
 
 # TODO different credentials
   portfolio-mgmt:
@@ -31,6 +37,9 @@ services:
       DB_NAME: portfolios 
       DB_USER: user
       DB_PASSWORD: password
+    networks:
+      - db_portfolio
+      - platform
 
   order-mgmt:
     hostname: order-mgmt
@@ -41,6 +50,9 @@ services:
       DB_USER: user
       DB_PASSWORD: password
       ORDER_SECRET: orderSecret
+    networks:
+      - db_order
+      - platform
 
   postgres:
     image: postgres
@@ -52,11 +64,47 @@ services:
     volumes:
       - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
       - postgres-data:/var/lib/postgresql/data
+    networks:
+      - db_auth
+      - db_order
+      - db_portfolio
+      - db_admin
   
   adminer:
     image: adminer:latest
     restart: always
     ports:
       - 8080:8080
+    networks:
+      - db_admin
+
+  # kong:
+  #   image: kong:latest
+  #   volumes:
+  #       - ./kong:/usr/local/kong/declarative
+  #   environment:
+  #       KONG_DATABASE: 'off'
+  #       KONG_DECLARATIVE_CONFIG: /usr/local/kong/declarative/kong.yml
+  #       KONG_PROXY_ACCESS_LOG: /dev/stdout
+  #       KONG_ADMIN_ACCESS_LOG: /dev/stdout
+  #       KONG_PROXY_ERROR_LOG: /dev/stderr
+  #       KONG_ADMIN_ERROR_LOG: /dev/stderr
+  #       KONG_ADMIN_LISTEN: 0.0.0.0:8001, 0.0.0.0:8444 ssl
+  #   ports:
+  #       - 80:8000
+  #       - 443:8443
+  #       - 8001:8001
+  #       - 8444:8444
+  #   networks:
+  #       - internal
+
 volumes:
   postgres-data:
+
+networks:
+  db_auth:
+  db_order:
+  db_portfolio:
+  db_admin:
+  platform:
+  internal:
