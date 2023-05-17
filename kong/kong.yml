@@ -1,0 +1,21 @@
+_format_version: "2.1"
+
+services:      
+  - name: auth-service
+    url: http://auth:5000/
+    routes:
+      - name: auth-service
+        paths:
+          - /auth
+  - name: trading-platform
+    url: http://trading-platform:5000
+    routes:
+      - name: trading-platform-service
+        paths:
+          - /platform
+  - name: adminer
+    url: http://adminer:8080
+    routes:
+      - name: adminer
+        paths:
+          - /adminer

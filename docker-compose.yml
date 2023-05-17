@@ -3,8 +3,6 @@ services:
   auth:
     hostname: auth
     build: ./auth
-    ports:
-      - 8081:5000
     environment:
       HOST_NAME: postgres
       AUTH_DB_NAME: auth
@@ -20,8 +18,6 @@ services:
   trading-platform:
     hostname: trading-platform
     build: ./platform
-    ports:
-      - 8082:5000
     environment:
       ORDER_SECRET: orderSecret
     networks:
@@ -77,26 +73,20 @@ services:
       - 8080:8080
     networks:
       - db_admin
+      - internal
 
-  # kong:
-  #   image: kong:latest
-  #   volumes:
-  #       - ./kong:/usr/local/kong/declarative
-  #   environment:
-  #       KONG_DATABASE: 'off'
-  #       KONG_DECLARATIVE_CONFIG: /usr/local/kong/declarative/kong.yml
-  #       KONG_PROXY_ACCESS_LOG: /dev/stdout
-  #       KONG_ADMIN_ACCESS_LOG: /dev/stdout
-  #       KONG_PROXY_ERROR_LOG: /dev/stderr
-  #       KONG_ADMIN_ERROR_LOG: /dev/stderr
-  #       KONG_ADMIN_LISTEN: 0.0.0.0:8001, 0.0.0.0:8444 ssl
-  #   ports:
-  #       - 80:8000
-  #       - 443:8443
-  #       - 8001:8001
-  #       - 8444:8444
-  #   networks:
-  #       - internal
+  kong:
+    image: kong:latest
+    volumes:
+        - ./kong:/usr/local/kong/declarative
+    environment:
+        KONG_DATABASE: 'off'
+        KONG_DECLARATIVE_CONFIG: /usr/local/kong/declarative/kong.yml
+    ports:
+        - 80:8000
+        - 443:8443
+    networks:
+        - internal
 
 volumes:
   postgres-data:
