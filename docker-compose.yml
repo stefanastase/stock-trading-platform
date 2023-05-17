@@ -52,7 +52,6 @@ services:
 
   postgres:
     image: postgres
-    restart: always
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
@@ -72,7 +71,6 @@ services:
   
   adminer:
     image: adminer:latest
-    restart: always
     ports:
       - 8080:8080
     networks:
@@ -127,11 +125,44 @@ services:
     networks:
       - logging
 
+  agent:
+    image: portainer/agent:2.11.1
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/volumes:/var/lib/docker/volumes
+    networks:
+      - agent_network
+    deploy:
+      mode: global
+      placement:
+        constraints: [node.platform.os == linux]
+
+  portainer:
+    image: portainer/portainer-ce:2.11.1
+    command: -H tcp://tasks.agent:9001 --tlsskipverify
+    ports:
+      - "9443:9443"
+      - "9000:9000"
+      - "8000:8000"
+    volumes:
+      - portainer_data:/data
+    networks:
+      - agent_network
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+    
 
 volumes:
   postgres-data:
+  portainer_data:
 
 networks:
+  agent_network:
+      driver: overlay
+      attachable: true
   db_auth:
   db_order:
   db_portfolio:
