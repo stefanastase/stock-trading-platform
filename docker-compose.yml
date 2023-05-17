@@ -2,7 +2,7 @@ version: "3.9"
 services:
   auth:
     hostname: auth
-    build: ./auth
+    image: gitlab.cs.pub.ro:5050/idp_2023_stock_trading_platform/stock_trading_auth:latest
     environment:
       HOST_NAME: postgres
       AUTH_DB_NAME: auth
@@ -17,7 +17,7 @@ services:
 
   trading-platform:
     hostname: trading-platform
-    build: ./platform
+    image: gitlab.cs.pub.ro:5050/idp_2023_stock_trading_platform/stock_trading_platform
     environment:
       ORDER_SECRET: orderSecret
     networks:
@@ -27,7 +27,7 @@ services:
 # TODO different credentials
   portfolio-mgmt:
     hostname: portfolio-mgmt
-    build: ./portfolio-mgmt
+    image: gitlab.cs.pub.ro:5050/idp_2023_stock_trading_platform/stock_trading_portfolio_management
     environment:
       HOST_NAME: postgres
       DB_NAME: portfolios 
@@ -39,7 +39,7 @@ services:
 
   order-mgmt:
     hostname: order-mgmt
-    build: ./order-mgmt
+    image: gitlab.cs.pub.ro:5050/idp_2023_stock_trading_platform/stock_trading_order_management
     environment:
       HOST_NAME: postgres
       DB_NAME: orders
@@ -57,6 +57,10 @@ services:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
       POSTGRES_DB: auth
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
     volumes:
       - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
       - postgres-data:/var/lib/postgresql/data
@@ -92,6 +96,9 @@ services:
       - 443:8443
       - 8001:8001
       - 8444:8444
+    deploy:
+      placement:
+        constraints: [node.role == manager]
     networks:
       - internal
       - logging
@@ -102,6 +109,9 @@ services:
       - ./grafana/data:/var/lib/grafana
     ports:
       - 3000:3000
+    deploy:
+      placement:
+        constraints: [node.role == manager]
     networks:
       - logging
 
@@ -111,6 +121,9 @@ services:
       - ./prometheus/config.yml:/etc/prometheus/prometheus.yml
     ports:
       - 9090:9090
+    deploy:
+      placement:
+        constraints: [node.role == manager]
     networks:
       - logging
 
