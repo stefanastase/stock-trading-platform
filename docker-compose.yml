@@ -3,13 +3,16 @@ services:
   auth:
     hostname: auth
     image: gitlab.cs.pub.ro:5050/idp_2023_stock_trading_platform/stock_trading_auth:latest
+    secrets:
+      - auth_db_password_secret
+      - auth_secret
     environment:
       HOST_NAME: postgres
       AUTH_DB_NAME: auth
       PORTFOLIOS_DB_NAME: portfolios
-      DB_USER: user
-      DB_PASSWORD: password
-      AUTH_SECRET: secret
+      DB_USER: auth_user
+      DB_PASSWORD_FILE: /run/secrets/auth_db_password_secret
+      AUTH_SECRET_FILE: /run/secrets/auth_secret
       EXPIRE_TIME_SEC: 1800 # 30 min
     networks:
       - db_auth
@@ -18,8 +21,10 @@ services:
   trading-platform:
     hostname: trading-platform
     image: gitlab.cs.pub.ro:5050/idp_2023_stock_trading_platform/stock_trading_platform
+    secrets:
+      - order_secret
     environment:
-      ORDER_SECRET: orderSecret
+      ORDER_SECRET_FILE: /run/secrets/order_secret
     logging:
       driver: loki
       options:
@@ -31,15 +36,16 @@ services:
       - internal
       - logging
 
-# TODO different credentials
   portfolio-mgmt:
     hostname: portfolio-mgmt
     image: gitlab.cs.pub.ro:5050/idp_2023_stock_trading_platform/stock_trading_portfolio_management
+    secrets:
+      - portfolio_db_password_secret
     environment:
       HOST_NAME: postgres
       DB_NAME: portfolios 
-      DB_USER: user
-      DB_PASSWORD: password
+      DB_USER: portfolios_user
+      DB_PASSWORD_FILE: /run/secrets/portfolio_db_password_secret
     networks:
       - db_portfolio
       - platform
@@ -47,22 +53,27 @@ services:
   order-mgmt:
     hostname: order-mgmt
     image: gitlab.cs.pub.ro:5050/idp_2023_stock_trading_platform/stock_trading_order_management
+    secrets:
+      - order_db_password_secret
+      - order_secret
     environment:
       HOST_NAME: postgres
       DB_NAME: orders
-      DB_USER: user
-      DB_PASSWORD: password
-      ORDER_SECRET: orderSecret
+      DB_USER: orders_user
+      DB_PASSWORD_FILE: /run/secrets/order_db_password_secret
+      ORDER_SECRET_FILE: /run/secrets/order_secret
     networks:
       - db_order
       - platform
 
   postgres:
     image: postgres
+    secrets:
+      - pg_user_secret
+      - pg_password_secret
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: auth
+      POSTGRES_USER_FILE: /run/secrets/pg_user_secret
+      POSTGRES_PASSWORD_FILE: /run/secrets/pg_password_secret
     deploy:
       placement:
         constraints: [node.role == manager]
@@ -193,3 +204,19 @@ networks:
   platform:
   internal:
   logging:
+
+secrets:
+  pg_user_secret:
+    file: './secrets/pg_user.txt'
+  pg_password_secret:
+    file: './secrets/pg_password.txt'
+  auth_secret:
+    file: './secrets/auth.txt'
+  auth_db_password_secret:
+    file: './secrets/auth_db_password.txt'
+  order_secret:
+    file: './secrets/order.txt'
+  order_db_password_secret:
+    file: './secrets/order_db_password.txt'
+  portfolio_db_password_secret:
+    file: './secrets/portfolio_db_password.txt'
