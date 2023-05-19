@@ -20,9 +20,16 @@ services:
     image: gitlab.cs.pub.ro:5050/idp_2023_stock_trading_platform/stock_trading_platform
     environment:
       ORDER_SECRET: orderSecret
+    logging:
+      driver: loki
+      options:
+          loki-url: http://host.docker.internal:3100/loki/api/v1/push
+          loki-external-labels: job=myjob,owner=stefan,environment=development
+
     networks:
       - platform
       - internal
+      - logging
 
 # TODO different credentials
   portfolio-mgmt:
@@ -112,6 +119,22 @@ services:
         constraints: [node.role == manager]
     networks:
       - logging
+  
+  loki:
+    image: grafana/loki
+    volumes:
+        - ./loki/loki.yml:/etc/config/loki.yml
+        - ./loki/wal:/wal
+    entrypoint:
+        - /usr/bin/loki
+        - -config.file=/etc/config/loki.yml
+    ports:
+        - 3100:3100
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+    networks:
+        - logging
 
   prometheus:
     image: prom/prometheus
