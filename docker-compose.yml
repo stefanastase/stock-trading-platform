@@ -18,11 +18,14 @@ services:
       driver: loki
       options:
           loki-url: http://host.docker.internal:3100/loki/api/v1/push
-          loki-external-labels: job=auth,owner=auth_service,environment=development
+          loki-external-labels: job=auth,owner=auth_service,environment=prod
     networks:
       - db
       - internal
       - logging
+    deploy:
+      mode: replicated
+      replicas: 2
 
   trading-platform:
     hostname: trading-platform
@@ -35,12 +38,13 @@ services:
       driver: loki
       options:
           loki-url: http://host.docker.internal:3100/loki/api/v1/push
-          loki-external-labels: job=platform,owner=platform_service,environment=development
-
+          loki-external-labels: job=platform,owner=platform_service,environment=prod
     networks:
       - platform
       - internal
       - logging
+    deploy:
+      mode: global
 
   portfolio-mgmt:
     hostname: portfolio-mgmt
@@ -55,6 +59,9 @@ services:
     networks:
       - db
       - platform
+    deploy:
+      mode: replicated
+      replicas: 2
 
   order-mgmt:
     hostname: order-mgmt
@@ -71,6 +78,8 @@ services:
     networks:
       - db
       - platform
+    deploy:
+      mode: global
 
   postgres:
     image: postgres
@@ -81,6 +90,8 @@ services:
       POSTGRES_USER_FILE: /run/secrets/pg_user_secret
       POSTGRES_PASSWORD_FILE: /run/secrets/pg_password_secret
     deploy:
+      mode: replicated
+      replicas: 1
       placement:
         constraints: [node.role == manager]
 
@@ -98,6 +109,9 @@ services:
     networks:
       - db_admin
       - internal
+    deploy:
+      mode: replicated
+      replicas: 1
 
   kong:
     image: kong:latest
@@ -117,6 +131,8 @@ services:
       - 8001:8001
       - 8444:8444
     deploy:
+      mode: replicated
+      replicas: 1
       placement:
         constraints: [node.role == manager]
     networks:
@@ -130,6 +146,8 @@ services:
     ports:
       - 3000:3000
     deploy:
+      mode: replicated
+      replicas: 1
       placement:
         constraints: [node.role == manager]
     networks:
