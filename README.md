@@ -1,92 +1,84 @@
-# Config
+# Proiect IDP - Stock Trading Platfrom
+
+## Introducere
+Scopul proiectului este de a realiza o aplicație web folosind Docker, ce va permite utilizatorilor autentificați sa tranzacționeze acțiuni listate pe piețele bursiere. Platforma oferă clienților accesul la pretul in timp real despre cotațiile bursiere si permite tranzacționarea acțiunilor prin plasarea ordinelor de cumpărare sau de vânzare, ce vor fi executate automat de către aplicație când condițiile impuse sunt îndeplinite.
 
 
+## Arhitectura aplicației
+Aplicatia propusa prezinta o arhitectura modulara, bazate pe mai multe containere. In figura de mai jos se poate observa arhitectura propusa.
 
-## Getting started
+![arhitectura](/img/arhitectura.png)
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+## Descrierea componentelor aplicației
+- KONG API Gateway – KONG va fi folosit pentru a expune aplicația clienților. Serviciul va fi expus la portul 80 al serverului pe care aplicatia ruleaza. Folosind KONG vom expune public rutele pentru autentificare (prefixate cu `/auth`), rutele pentru platforma de trading (prefixate cu `/platform`) si ruta pentru serviciul Adminer (`/adminer`).
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+- Auth Service – Componenta de autentificare si autorizare va fi folosita pentru a gestiona conturile clienților din baza de date, dar si pentru accesul acestora la platforma de tranzacționare. Serviciul oferă următoarele funcționalități:
+    - REGISTER – permite utilizatorilor sa își creeze un cont pe platforma si îl stochează in baza de date; inregistrarea se va face pe ruta `/register` cu o cerere de tip POST cu parametrii `client_id` si `client_secret`;
+    - LOG-IN – permite utilizatorilor sa se conecteze cu datele proprii si generează un jeton JWT pentru accesul la platforma de tranzacționare; autentificarea se va face pe ruta `/login` cu o cerere de tip POST cu parametrii `client_id` si `client_secret`;
+    - VERIFY – verifica valabilitatea jetonului JWT furnizat; ruta `/verify` va fi accesata de catre serviciul Trading Service printr-o cerere de tip POST cu token-ul JWT trimis in header-ul de autentificare
+    - LOG-OUT – invalidează jetonul JWT al utilizatorului; operatia se va face trimitand o cerere de tip POST pe ruta `/logout` cu token-ul JWT trimis in header-ul de autentificare
 
-## Add your files
+- Stock Trading Service – Componenta principala a aplicației, responsabila pentru partea de „business logic”. Serviciul va permite accesul clienților, după verificarea jetonului JWT, la următoarele funcționalități:
+    - GET QUOTES – obține ultimele date disponibile despre un indice, datele includ pretul acestuia si informatii despre ordinele plasate; functionalitatea este disponibila printr-o cerere de tipul GET la ruta `/quotes/<symbol>` unde `<symbol>` este simbolul folosind pentru tranzactionare.
+    - PLACE ORDER – creează un nou ordin pentru utilizatorul curent; functionalitatea este disponibila printr-o cerere de tipul POST la una dintre  rutele `/quotes/<symbol>/buy` sau `quotes/<symbol>/sell` unde `<symbol>` este simbolul folosind pentru tranzactionare. Continutul cererii va trebui sa contina cantitatea (`quantity`) si pretul (`price`), dar si un token de autentificare valid in header-ul de autentificare.
+    - UPDATE ORDER – modifica un ordin creat anterior de utilizatorul curent; functionalitatea este disponibila printr-o cerere de tipul PUT la ruta `/orders/<id>` unde `<id>` este id-ul ordinului ce se doreste a fi modificat. Continutul cererii va trebui sa contina cantitatea (`quantity`) si pretul (`price`), dar si un token de autentificare valid in header-ul de autentificare.
+    - REMOVE ORDER – anulează un ordin plasat de utilizatorul curent; functionalitatea este disponibila printr-o cerere de tipul DELETE la ruta `/orders/<id>` unde `<id>` este id-ul ordinului ce se doreste a fi sters. Continutul cererii va trebui sa contina un token de autentificare valid in header-ul de autentificare.
+    - PROCESS ORDER - trimite serviciului de management al portofoliului informatiile de actualizare dupa ce o cerere a fost executata de serviciul de management al ordinelor; functionalitatea este disponibila printr-o cerere de tipul POST la ruta `/orders/process`. Continutul cererii va trebui sa contina un secret al serviciului de procesare a ordinelor (`secret`), id-urile clientilor (`id_client`, `from_id_client`), tipul (`type`), simbolul (`symbol`), cantitatea (`quantity`) si pretul (`pretul`).
+    - GET PORTFOLIO – afișează informații despre portofoliul utilizatorului; functionalitatea este disponibila printr-o cerere de tipul GET la ruta `/portfolio`. Continutul cererii va trebui sa contina un token de autentificare valid in header-ul de autentificare.
+    - DEPOSIT FUNDS – alimentează componenta cash prin transfer bancar; functionalitatea este disponibila printr-o cerere de tipul POST la ruta `/deposit`. Continutul cererii va trebui sa contina suma (`amount`), dar si un token de autentificare valid in header-ul de autentificare.
+    - WITHDRAW FUNDS - retrage fonduri din componenta cash prin transfer bancar; functionalitatea este disponibila printr-o cerere de tipul POST la ruta `/withdraw`. Continutul cererii va trebui sa contina suma (`amount`), dar si un token de autentificare valid in header-ul de autentificare.
+- Market Data Service – Componenta auxiliara a aplicației, responsabila pentru obținerea datelor in timp real a unui simbol bursier de pe platforma Yahoo! Finance. La nivelul aplicatiei, componenta este integrata in servicul Stock Trading Platform
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+- Portfolio Management Service – Componenta responsabila pentru interacțiunea cu baza de date Portfolios DB; prezinta rute pentru obtinerea portofoliului unui client (`GET /portfolio/<id>`) si pentru actualizarea portofoliului unui client (`PUT /portfolio/<id>`).
 
+- Order Management Service – Componenta responsabila pentru interacțiunea cu baza de date Orders DB. Pe lângă aceasta funcționalitate, componenta va executa ordinele plasate daca o pereche de ordine (cumpărare, vânzare) cu același preț este găsita in baza de date. Aceasta verificare se va face după fiecare introducere a unui nou ordin in baza de date. Serviciul prezinta rute pentru adaugarea ordinelor (`POST /orders`), obtinerea ordinelor dupa id ordin (`GET /orders/<id>`) si dupa id-ul clientului (`GET /orders/client/<id>`), actualizarea ordinelor dupa id (`PUT /orders/<id>`), stergerea ordinelor dupa id (`DELETE /orders/<id>`) si obtinerea adancimii pentru un simbol (`GET /depth/<symbol`>).
+
+- Postgres - Sistemul de baze de date va contine 4 utilizatori (admin, auth_service, portfolios_service, orders_service) si 3 baze de date:
+    - Auth DB – conține 2 tabele: users - stochează datele de autentificare ale clienților platformei (nume utilizator, parola criptata); expired_tokens – stochează datele despre jetoanele JWT expirate.
+    - Portfolios DB – Conține o tabela pentru fiecare client in care sunt stocate informații despre acțiunile deținute si componenta lichida.
+    - Orders DB – Conține informații despre toate ordinele plasate de către utilizatori in ultimele 10 de zile. Baza de date contine 2 tabele: una pentru ordinele plasate, una pentru cele executate.Informatiile includ: identificatorul utilizatorului, identificatorul celui de-al doilea client (daca este cazul), valoarea ordinului, simbolul actiunii, cantitatea, data plasarii sau data executarii.
+- Portainer + Agent – Serviciu folosit pentru gestiunea din UI a clusterului. Serviciul poate fi accesat pe portul 9000.
+- Adminer – Utilitar folosit pentru gestiunea bazelor de date.
+- Prometheus – Sistem de monitorizare folosit pentru a obtine metrici de la serviciul de Kong.
+- Loki – Sistem de logging, ce obtine log-urile trimise catre driver-ul de Loki de catre docker
+- Grafana – Sistem de vizualizare metrici si log-uri. Prezinta doua dashboard-uri: primul dashboard este dashboard-ul default de Kong si afiseaza metricile obtinute de la serviciul de Kong, al doilea dashboard prezinta mai multe ecrane pentru vizualizarea mesajelor de log provenite de la serviciile de autentificare si de la platforma. Serviciul este disponibil pe portul 3000. 
+
+## Rulare folosind Play With Docker
+
+Pentru rularea cu [Play With Docker](https://labs.play-with-docker.com/) vom initializa un Swarm cu 1 manager si 2 workeri.
+Pe nodul manager vom incarca repository-ul de configurare si vom introduce comanda `docker login` pentru a ne conecta la registrul Gitlab cu imagini.
 ```
-cd existing_repo
-git remote add origin https://gitlab.cs.pub.ro/idp_2023_stock_trading_platform/config.git
-git branch -M main
-git push -uf origin main
+docker login gitlab.cs.pub.ro:5050
+```
+Pe fiecare dintre cele trei noduri vom instala plugin-ul de logare folosind Loki.
+```
+docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions
 ```
 
-## Integrate with your tools
+Vom modifica daemon-ul de Docker pe fiecare nod astfel incat logarea sa se faca folosind driver-ul de Loki instalat anterior. O configuratie posibila pentru fisierul `/etc/docker/daemon.json` poate fi gasita in fisierul `/pwd-init/daemon.json`:
+```
+{
+    "experimental": true,
+    "debug": false,
+    "log-driver": "loki",
+    "log-opts": {
+      "loki-url": "http://127.0.0.1:3100/loki/api/v1/push"
+    },
+    "log-level": "info",
+    "insecure-registries": ["127.0.0.1"],
+    "hosts": ["unix:///var/run/docker.sock", "tcp://0.0.0.0:2375"],
+    "tls": false,
+    "tlscacert": "",
+    "tlscert": "",
+    "tlskey": ""
+}
+```
 
-- [ ] [Set up project integrations](https://gitlab.cs.pub.ro/idp_2023_stock_trading_platform/config/-/settings/integrations)
+In final, vom restarta serviciul de Docker pe fiecare nod:
+```
+kill -9 `pgrep dockerd`; dockerd > /docker.log 2>&1 &
+```
 
-## Collaborate with your team
+## Testare
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Automatically merge when pipeline succeeds](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
-
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thank you to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+Pentru testarea rutelor expuse catre utilizatori folosind serviciul Kong, se poate folosi fisierul `/tests/trading-platform.postman_collection.json` ce contine o colectie de teste pentru aplicatia Postman. Folosind variabile de mediu utilizatorul poate seta jetoanele clientilor. `TOKENn`, si adresa host-ului pe care ruleaza aplicatia, `HOSTNAME`.

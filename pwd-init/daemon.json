@@ -1,0 +1,15 @@
+{
+    "experimental": true,
+    "debug": false,
+    "log-driver": "loki",
+    "log-opts": {
+      "loki-url": "http://127.0.0.1:3100/loki/api/v1/push"
+    },
+    "log-level": "info",
+    "insecure-registries": ["127.0.0.1"],
+    "hosts": ["unix:///var/run/docker.sock", "tcp://0.0.0.0:2375"],
+    "tls": false,
+    "tlscacert": "",
+    "tlscert": "",
+    "tlskey": ""
+}

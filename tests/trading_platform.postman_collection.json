@@ -1,0 +1,464 @@
+{
+	"info": {
+		"_postman_id": "acc468c1-fbc6-4858-a8c4-bdb6689c5d74",
+		"name": "Test Proiect IDP",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Register User",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "client_id",
+							"value": "mircea",
+							"type": "default"
+						},
+						{
+							"key": "client_secret",
+							"value": "123",
+							"type": "default"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOSTNAME}}/auth/register",
+					"host": [
+						"{{HOSTNAME}}"
+					],
+					"path": [
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Auth User",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "client_id",
+							"value": "paul",
+							"type": "default"
+						},
+						{
+							"key": "client_secret",
+							"value": "123",
+							"type": "default"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOSTNAME}}/auth/login",
+					"host": [
+						"{{HOSTNAME}}"
+					],
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Verify User",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{TOKEN1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": []
+				},
+				"url": {
+					"raw": "{{HOSTNAME}}/auth/verify",
+					"host": [
+						"{{HOSTNAME}}"
+					],
+					"path": [
+						"auth",
+						"verify"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Portfolio",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{TOKEN2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{HOSTNAME}}/platform/portfolio",
+					"host": [
+						"{{HOSTNAME}}"
+					],
+					"path": [
+						"platform",
+						"portfolio"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Deposit Funds",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{TOKEN1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"amount\": 1000.4\r\n}"
+				},
+				"url": {
+					"raw": "{{HOSTNAME}}/platform/deposit",
+					"host": [
+						"{{HOSTNAME}}"
+					],
+					"path": [
+						"platform",
+						"deposit"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Withdraw Funds",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{TOKEN1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"amount\": 9.6\r\n}"
+				},
+				"url": {
+					"raw": "{{HOSTNAME}}/platform/withdraw",
+					"host": [
+						"{{HOSTNAME}}"
+					],
+					"path": [
+						"platform",
+						"withdraw"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Quotes",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{HOSTNAME}}/platform/quotes/WFC",
+					"host": [
+						"{{HOSTNAME}}"
+					],
+					"path": [
+						"platform",
+						"quotes",
+						"WFC"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Place Buy Order",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{TOKEN2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"quantity\": 1,\r\n    \"price\": 26.323\r\n}"
+				},
+				"url": {
+					"raw": "{{HOSTNAME}}/platform/quotes/BAC/buy",
+					"host": [
+						"{{HOSTNAME}}"
+					],
+					"path": [
+						"platform",
+						"quotes",
+						"BAC",
+						"buy"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Place Sell Order",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{TOKEN1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"quantity\": 1,\r\n    \"price\": 26.25\r\n}"
+				},
+				"url": {
+					"raw": "{{HOSTNAME}}/platform/quotes/BAC/sell",
+					"host": [
+						"{{HOSTNAME}}"
+					],
+					"path": [
+						"platform",
+						"quotes",
+						"BAC",
+						"sell"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Orders",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{TOKEN1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{HOSTNAME}}/platform/orders",
+					"host": [
+						"{{HOSTNAME}}"
+					],
+					"path": [
+						"platform",
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Order",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{TOKEN1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"quantity\" : 10,\r\n    \"price\": 2.7\r\n}"
+				},
+				"url": {
+					"raw": "{{HOSTNAME}}/platform/orders/1",
+					"host": [
+						"{{HOSTNAME}}"
+					],
+					"path": [
+						"platform",
+						"orders",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remove Order",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{TOKEN1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{HOSTNAME}}/platform/orders/5",
+					"host": [
+						"{{HOSTNAME}}"
+					],
+					"path": [
+						"platform",
+						"orders",
+						"5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Process Order",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"secret\": \"orderSecret\",\r\n    \"client_id\": \"stefan\",\r\n    \"type\": \"B\",\r\n    \"symbol\": \"BAC\",\r\n    \"from_client_id\": \"external\",\r\n    \"quantity\": 1,\r\n    \"price\": 27\r\n    }"
+				},
+				"url": {
+					"raw": "{{HOSTNAME}}/platform/orders/process",
+					"host": [
+						"{{HOSTNAME}}"
+					],
+					"path": [
+						"platform",
+						"orders",
+						"process"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Logout User",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{TOKEN1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{HOSTNAME}}/auth/logout",
+					"host": [
+						"{{HOSTNAME}}"
+					],
+					"path": [
+						"auth",
+						"logout"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "TOKEN1",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiY2xpZW50SUQiOiJtaXJjZWEiLCJleHBpcmF0aW9uVGltZSI6IjA1LzIxLzIwMjMsIDA4OjAzOjU2In0.MxwZDLoh6bZdi_Vzf_fXTn6O1GnSc39Ey__fgD_05Zo",
+			"type": "default"
+		},
+		{
+			"key": "TOKEN2",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiY2xpZW50SUQiOiJzdGVmYW4iLCJleHBpcmF0aW9uVGltZSI6IjA1LzIxLzIwMjMsIDA4OjA0OjIxIn0.5vIc4w5TDYP8US404DpNq8xlF26TN4S-jjQuPSTnTG0",
+			"type": "default"
+		},
+		{
+			"key": "HOSTNAME",
+			"value": "localhost",
+			"type": "default"
+		}
+	]
+}
