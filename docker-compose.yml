@@ -14,11 +14,6 @@ services:
       DB_PASSWORD_FILE: /run/secrets/auth_db_password_secret
       AUTH_SECRET_FILE: /run/secrets/auth_secret
       EXPIRE_TIME_SEC: 1800 # 30 min
-    logging:
-      driver: loki
-      options:
-          loki-url: http://host.docker.internal:3100/loki/api/v1/push
-          loki-external-labels: job=auth,owner=auth_service,environment=prod
     networks:
       - db
       - internal
@@ -34,11 +29,6 @@ services:
       - order_secret
     environment:
       ORDER_SECRET_FILE: /run/secrets/order_secret
-    logging:
-      driver: loki
-      options:
-          loki-url: http://host.docker.internal:3100/loki/api/v1/push
-          loki-external-labels: job=platform,owner=platform_service,environment=prod
     networks:
       - platform
       - internal
@@ -142,7 +132,10 @@ services:
   grafana:
     image: grafana/grafana:latest
     volumes:
-      - ./grafana/data:/var/lib/grafana
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/dashboards:/etc/grafana/dashboards
+      - grafana_data:/var/lib/grafana
     ports:
       - 3000:3000
     deploy:
@@ -159,12 +152,13 @@ services:
     image: grafana/loki
     volumes:
         - ./loki/loki.yml:/etc/config/loki.yml
-        - ./loki/wal:/wal
+        - loki_data:/tmp/loki
     entrypoint:
         - /usr/bin/loki
         - -config.file=/etc/config/loki.yml
     ports:
         - 3100:3100
+    user: 0:0
     deploy:
       placement:
         constraints: [node.role == manager]
@@ -217,6 +211,8 @@ services:
 volumes:
   postgres-data:
   portainer_data:
+  grafana_data:
+  loki_data:
 
 networks:
   agent_network:

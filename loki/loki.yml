@@ -5,6 +5,18 @@ server:
   http_server_read_timeout: 300s
   http_server_write_timeout: 300s
 
+common:
+  ring:
+    instance_addr: 127.0.0.1
+    kvstore:
+      store: inmemory
+  replication_factor: 1
+  path_prefix: /tmp/loki
+
+frontend:
+  address: 127.0.0.1
+  max_outstanding_per_tenant: 4096
+  
 ingester:
   lifecycler:
     address: 127.0.0.1
@@ -18,7 +30,7 @@ ingester:
 
 schema_config:
   configs:
-  - from: 2023-05-16
+  - from: 2023-05-20
     store: boltdb
     object_store: filesystem
     schema: v11
@@ -59,10 +71,6 @@ table_manager:
 
 query_scheduler:
   max_outstanding_requests_per_tenant: 4096
-
-frontend:
-  address: 127.0.0.1
-  max_outstanding_per_tenant: 4096
   
 query_range:
   parallelise_shardable_queries: true
