@@ -1,0 +1,174 @@
+# Changelog
+
+## [0.1] - 25/04/2023
+
+### Adaugari
+
+- Adaugare serviciu autentificare in stiva de servicii
+- Adaugare serviciu de baza de date in stiva de servicii (PostgreSQL)
+- Adaugare utilitar pentru gestiunea bazei de date in stiva de servicii (Adminer)
+- Adaugare baza de date pentru autentificare
+- Adaugare tabela pentru utilizatori in baza de date
+- Implementare functionalitate REGISTER pentru serviciul de autentificare
+- Implementare functionliate AUTH (LOG-IN) pentru serviciul de autentificare
+- Implementare functionalitate VERIFY pentru serviciul de autentificare
+
+## [0.1.1] - 26/04/2023
+
+### Adaugari
+
+- Implementare functionalitate LOGOUT pentru serviciul de autentificare
+- Adaugare tabela pentru tokenii invalidati in baza de date
+
+### Fixes
+
+- Fix pentru eroare in cazul in care token-ul de autorizare lipsea pentru VERIFY
+
+## [0.2] - 26/04/2023
+
+### Adaugari
+
+- Adaugare serviciu business logic (stock trading platform) in stiva de servicii
+- Implementare script pentru obtinerea pretului unui simbol folosind Yahoo! Finance
+- Implementare functionalitate GET QUOTES pentru serviciul Stock Trading Platform
+
+## [0.3] - 26/04/2023
+
+### Adaugari
+
+- Adaugare mecanism de verificare a jetonului JWT folosind serviciul de autentificare pentru cererile clientilor catre platforma de trading
+- Implementare functionalitate GET PORTFOLIO pentru serviciul Stock Trading Platform
+- Adaugare baza de date pentru portofoliile clientilor
+- Adaugare serviciu Portfolio Management in stiva de servicii
+- Implementare mecanism de obtinere a portofoliului unui client din baza de date pentru serviciul Portfolio Management
+
+## [0.3.1] - 26/04/2023
+
+### Adaugari
+- Implementare functionalitati DEPOSIT CASH si WITHDRAW CASH pentru serviciul Stock Trading Platform
+- Implementare mecanism de actualizare a portofoliului pentru serviciul Portfolio Management
+
+## [0.3.2] - 27/04/2023
+
+### Fixes
+- Mutare logica creare portofoliu la inregistrarea utilizatorului in sistem
+- Afisare valoarea totala a portofoliului, alaturi de elementele componente, la operatia GET PORTFOLIO
+
+## [0.4] - 13/05/2023
+
+### Adaugari
+- Adaugare serviciu Order Management in stiva de servicii
+- Configurare baza de date Orders DB
+- Implementare functionalitate de PLACE ORDERS a serviciului Stock Trading Platform pentru ordine de tipul BUY si SELL
+- Implementare mecanism de adaugare noi ordine in baza de date pentru serviciul Order Management
+
+## [0.4.1] - 13/05/2023
+
+### Adaugari
+- Implementare ruta pentru GET ORDERS dupa numele utilizatorului in serviciul Order Management
+- Implementare ruta pentru GET ORDER dupa id-ul ordinului in serviciul Order Management
+- Implementare ruta pentru PUT ORDER in serviciul Order Management
+- Implementare functionalitate GET USER ORDERS in serviciul Stock Trading Platform
+- Implementare functionalitate UPDATE ORDER in serviciul Stock Trading Platfrom
+
+### Fixes
+- Editare raspuns PLACE ORDER astfel incat afiseaza id-ul ordinului plasat
+
+## [0.4.2] - 13/05/2023
+
+### Adaugari
+- Implementare ruta pentru DELETE ORDER in serviciul Order Management
+- Implementare functionalitate REMOVE ORDER in serviciul Stock Trading Platform
+
+## [0.5] - 15/05/2023
+
+### Adaugari
+- Adaugare mecanism de executare ordine la adaugarea unui nou ordin in serviciul Order Management (doar operatii cu baza de date)
+
+## [0.5.1] - 15/05/2023
+
+### Adaugari
+- Adaugare ruta pentru actualizarea portofoliului in serviciul Stock Trading Platform (accesibila doar pentru seriviciul de Order Management)
+- Extinderea functionalitatii de UPDATE PORTFOLIO din Portfolio Management pentru a permite adaugarea altor simboluri
+
+## [0.5.2] - 16/05/2023
+
+### Adaugari
+- Extinderea mecanismului de executare ordine astfel incat acesta trimite cereri de procesare a ordinului catre Stock Trading Platform
+- Dezvoltare functionalitate pentru a trimite cereri de actualizare a portofoliului pe baza ordinelor executate, trimise de catre Order Management
+
+### Fixes
+- Modificarea functiei de UPDATE PORTFOLIO din Portfolio Management astfel incat se va actualiza baza de date cu tot continutul cererii, nu doar cu primul camp al cererii
+
+## [0.5.3] - 16/05/2023
+
+### Fixes
+- Permiterea executiei unui ordin doar intre doi clienti diferiti
+- Modificare structura tabelei de portofoliu pentru a permite valori float ale componentei cash
+
+## [0.5.4] - 16/05/2023
+
+### Adaugari
+- Adaugare adancimea unui simbol (valorile extreme ale preturilor ordinelor plasate) in raspunsul functiei GET QUOTES a serviciului Stock Trading
+- Implementare query-uri pentru obtinerea adancimii in serviciul Order Management
+- Adaugare ordine executate in raspunsul pentru GET ORDERS din Stock Trading Platform
+
+### Fixes
+- Filtrarea ordinelor ce nu apartin clientilor interni la introducerea in tabela executed
+- Introducerea perechilor de ordine in tabela executed cu acelasi timestamp
+
+## [0.5.5] - 16/05/2023
+
+### Adaugari
+- Adaugare mecanism de invalidare token dupa o perioada de timp
+
+### Fixes
+- Setare perioada valabilitate token la 30 de minute
+
+## [0.6] - 17/05/2023
+
+### Adaugari
+- Adaugare serviciu Kong in stiva de servicii
+
+### Fixes
+- Separarea serviciilor din stiva in mai multe retele
+
+## [0.6.1] - 17/05/2023
+
+### Adaugari
+- Adaugare Prometheus si Grafana in stiva de servicii pentru a vizualiza metricile exportate de Kong
+
+### Fixes
+- Modificare fisier Docker Compose pentru rularea ca stiva de servicii folosind Docker Swarm
+
+## [0.6.2] - 17/05/2023
+
+### Adaugari
+- Adaugare serviciu Portainer si agentul sau in stiva de servicii
+
+## [0.6.3] - 18/05/2023
+
+### Adaugari
+- Adaugare serviciu pentru logare (Loki) in stiva de servicii
+- Adaugare utilizatori diferiti pentru fiecare serviciu ce acceseaza baza de date
+
+### Fixed
+- Folosire Docker Secrets pentru stocarea informatiilor sensibile necesare
+
+## [0.6.4] - 18/05/2023
+
+### Adaugari
+- Adaugare mesaje de logging serviciul de autentificare
+- Adaugare mesaje de logging serviciul Trading Platform
+
+## [0.7] - 19/05/2023
+
+### Adaugari
+- Adaugare setari provizionare in configuratia serviciului de Grafana
+
+### Fixes
+- Modificare configuratie pentru Loki astfel incat acesta ruleaza corect in mediul Play with Docker (setare adresa ip front-end, crestere parametru max_outstanding_per_tenant, adaugare volum docker pentru persistenta, rulare Loki ca root, salvare date in /tmp/loki)
+
+### Stergeri
+- Stergere director /loki/wal din configuratie
+- Stergere camp isAdmin din baza de date a clientilor
