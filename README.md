@@ -81,3 +81,9 @@ kill -9 `pgrep dockerd`; dockerd > /docker.log 2>&1 &
 ## Testing
 
 To test the endpoints exposed using Kong, the file `/tests/trading-platform.postman_collection.json`, which contains a collection of Postman tests can be used. Using environment variables the user can set the customer tokens, `TOKENn`, and the host address, `HOSTNAME`.
+
+## Related repositories
+- Auth service: https://github.com/stefanastase/stock-trading-platform-auth
+- Business logic: https://github.com/stefanastase/stock-trading-platform-core
+- Portfolio management: https://github.com/stefanastase/stock-trading-platform-portfolio-mgmt
+- Order management: https://github.com/stefanastase/stock-trading-platform-order-mgmt
